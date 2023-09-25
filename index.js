@@ -12,6 +12,7 @@ const project = require('./package.json');
 
 const { name: projectName } = project;
 
+const requestOrigin = process.env.REQUEST_ORIGIN;
 const port = process.env.PORT || 8080;
 
 const transport = {
@@ -54,6 +55,15 @@ const app = express();
 app.use(compression());
 app.use(express.static(path.join(__dirname, 'build')));
 app.use(express.json());
+// cors workaround
+app.use(function (req, res, next) {
+  res.header('Access-Control-Allow-Origin', requestOrigin);
+  res.header(
+    'Access-Control-Allow-Headers',
+    'Origin, X-Requested-With, Content-Type, Accept'
+  );
+  next();
+});
 
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname + '/build/index.html'));
